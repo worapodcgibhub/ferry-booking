@@ -37,11 +37,17 @@ class BookingService
 
         try {
             return DB::transaction(function () use ($data, $passengers) {
-                $outbound = Trip::with('route')->find($data['outbound_trip_id'])
+                // ล็อกแถวรอบเรือเป็นคำสั่งแรกของธุรกรรม (เรียงตาม id กัน deadlock) ก่อนอ่านหรือแก้อย่างอื่น
+                // ถ้าอ่านแบบธรรมดาก่อน MariaDB (snapshot isolation) จะตอบ 1020 "Record has changed since last read"
+                // เมื่อมีคำขออื่นแก้แถวเดียวกันพร้อมกัน แทนที่จะรอคิวแล้วเห็นว่าที่นั่งเต็ม
+                $ids = array_values(array_unique(array_filter([(int) $data['outbound_trip_id'], (int) ($data['return_trip_id'] ?? 0)])));
+                $trips = Trip::with('route')->whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+
+                $outbound = $trips->get((int) $data['outbound_trip_id'])
                     ?? throw new BookingException('ไม่พบรอบเรือขาไป', 'outbound');
                 $return = null;
                 if (! empty($data['return_trip_id'])) {
-                    $return = Trip::with('route')->find($data['return_trip_id'])
+                    $return = $trips->get((int) $data['return_trip_id'])
                         ?? throw new BookingException('ไม่พบรอบเรือขากลับ', 'return');
                     $this->assertReturnValid($outbound, $return);
                 }
@@ -82,7 +88,7 @@ class BookingService
                 $booking->update(['total_amount' => $total]);
 
                 return $booking->fresh('legs');
-            });
+            }, 3); // ชนกันกับคำขออื่น (deadlock) ให้ลองใหม่ได้สูงสุด 3 ครั้ง
         } catch (UniqueConstraintViolationException $e) {
             // ส่งซ้ำพร้อมกัน: อีกคำขอสร้างเลขจองไปแล้ว ให้คืนเลขเดิม
             if ($existing = Booking::where('idempotency_key', $data['idempotency_key'])->first()) {
@@ -133,6 +139,10 @@ class BookingService
     public function release(Booking $booking, string $newStatus): bool
     {
         return DB::transaction(function () use ($booking, $newStatus) {
+            // ล็อกขาของการจองและแถวรอบเรือก่อน (ลำดับเดียวกับตอนจอง: รอบเรือเรียงตาม id) แล้วค่อยปิดสถานะและคืนที่นั่ง
+            $legs = BookingLeg::where('booking_id', $booking->id)->orderBy('trip_id')->lockForUpdate()->get();
+            Trip::whereIn('id', $legs->pluck('trip_id'))->orderBy('id')->lockForUpdate()->get();
+
             $claimed = Booking::where('id', $booking->id)
                 ->whereNull('seats_released_at')
                 ->whereIn('booking_status', ['pending', 'confirmed'])
@@ -142,7 +152,7 @@ class BookingService
                 return false;
             }
 
-            foreach (BookingLeg::where('booking_id', $booking->id)->orderBy('trip_id')->get() as $leg) {
+            foreach ($legs as $leg) {
                 $n = (int) $leg->passengers;
                 Trip::where('id', $leg->trip_id)->update([
                     'seats_taken' => DB::raw("CASE WHEN seats_taken >= {$n} THEN seats_taken - {$n} ELSE 0 END"),
@@ -150,7 +160,7 @@ class BookingService
             }
 
             return true;
-        });
+        }, 3);
     }
 
     /** ปล่อยที่นั่งของรายการที่เลยเวลาโดยยังไม่แจ้งโอน (รายการที่แนบสลิปแล้วไม่ถูกหมดเวลา) */
