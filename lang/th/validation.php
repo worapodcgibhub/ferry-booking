@@ -24,6 +24,10 @@ return [
     'url' => 'รูปแบบ:attributeไม่ถูกต้อง',
     'after_or_equal' => ':attribute ต้องเป็นวันที่ตั้งแต่ :date เป็นต้นไป',
     'before_or_equal' => ':attribute ต้องไม่เกิน :date',
+    // ข้อความตอนไฟล์ใหญ่เกินที่ขั้นอัปโหลดของ Livewire (ฟิลด์ files.*) แสดงเป็น MB ตามเพดานใน config/ferry.php
+    'custom' => [
+        'files.*' => ['max' => 'ไฟล์ต้องมีขนาดไม่เกิน '.(config('ferry.slip_max_kb') / 1024).' MB'],
+    ],
     'attributes' => [
         'slip' => 'สลิป', 'files.0' => 'ไฟล์', 'amount' => 'ยอดที่โอน', 'transferredAt' => 'เวลาที่โอน',
         'cover' => 'รูปปก', 'name' => 'ชื่อ', 'email' => 'อีเมล', 'password' => 'รหัสผ่าน',

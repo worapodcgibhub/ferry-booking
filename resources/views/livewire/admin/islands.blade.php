@@ -22,7 +22,7 @@
                 <label class="mt-7 flex items-center gap-2 font-semibold"><input type="checkbox" wire:model="isActive" class="h-5 w-5"> เปิดให้บริการ</label>
             </div>
             <div class="md:col-span-2">
-                <label class="label">รูปปก (ภาพแนวนอน ไม่เกิน 5 MB)</label>
+                <label class="label">รูปปก (ภาพแนวนอน ไม่เกิน 4 MB)</label>
                 <input type="file" wire:model="cover" accept="image/*" class="field">
                 <div wire:loading wire:target="cover" class="text-sm text-slate-500">กำลังอัปโหลด…</div>
                 @error('cover')<p class="err">{{ $message }}</p>@enderror

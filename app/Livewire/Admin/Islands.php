@@ -63,11 +63,11 @@ class Islands extends Component
             'description' => 'nullable|string|max:500',
             'areaId' => 'nullable|exists:areas,id',
             'sortOrder' => 'integer|min:0|max:999',
-            'cover' => ['nullable', 'image', 'max:5120'],
+            'cover' => ['nullable', 'image', 'max:4096'], // ตรงกับกฎอัปโหลดรวมใน config/livewire.php
         ], [
             'name.required' => 'กรุณากรอกชื่อเกาะ',
             'cover.image' => 'รูปปกต้องเป็นไฟล์ภาพ',
-            'cover.max' => 'รูปปกต้องไม่เกิน 5 MB',
+            'cover.max' => 'รูปปกต้องไม่เกิน 4 MB',
         ]);
 
         $island = $this->editingId ? Island::findOrFail($this->editingId) : new Island;
