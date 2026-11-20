@@ -74,7 +74,7 @@ it('ยอดไม่ตรง: เจ้าหน้าที่บันท�
 
     $d = Livewire::test(BookingDetail::class, ['booking' => $b])->assertSee('ไม่ตรงกับยอดจอง');
     $d->call('requestEvidence')->assertSee('กรุณาระบุเหตุผล'); // ไม่ใส่เหตุผลต้องไม่ผ่าน
-    $d->set('reason', 'โอนมา 100 บาท ยอดจริง 900 บาท')->call('requestEvidence')->assertSee('ขอหลักฐานใหม่จากลูกค้าแล้ว');
+    $d->set('evidenceReason', 'โอนมา 100 บาท ยอดจริง 900 บาท')->call('requestEvidence')->assertSee('ขอหลักฐานใหม่จากลูกค้าแล้ว');
     expect($b->fresh()->payment_status)->toBe('rejected')->and($b->fresh()->booking_status)->toBe('pending');
 
     $c = Livewire::test(BookingStatus::class, ['token' => $b->access_token])

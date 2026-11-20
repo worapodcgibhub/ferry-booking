@@ -43,7 +43,8 @@
                 <div class="mt-3 space-y-2 border-t pt-3">
                     <p class="text-sm font-semibold">ตรวจว่าเงินเข้าบัญชีตรงยอดแล้ว จึงกดยืนยัน</p>
                     <button wire:click="confirm" wire:confirm="ยืนยันว่าตรวจเงินเข้าบัญชีแล้ว?" class="btn-pink w-full" wire:loading.attr="disabled">ยืนยันการจอง</button>
-                    <textarea wire:model="reason" rows="2" class="field" placeholder="เหตุผลกรณียอดไม่ตรง (บังคับเมื่อขอหลักฐานใหม่)"></textarea>
+                    <label class="label" for="evidence-reason">เหตุผลที่ยอดไม่ตรง (ลูกค้าจะเห็น) <span class="text-pink">*</span></label>
+                    <textarea id="evidence-reason" wire:model="evidenceReason" rows="2" class="field" placeholder="เช่น โอนมา 100 บาท ยอดจริง 900 บาท กรุณาแนบสลิปใหม่"></textarea>
                     <button wire:click="requestEvidence" class="btn-line w-full">ยอดไม่ตรง · ขอหลักฐานใหม่</button>
                 </div>
             @endif
@@ -87,7 +88,8 @@
         <div class="card mt-4 p-4">
             <h2 class="mb-2 font-extrabold">ยกเลิกการจอง</h2>
             <p class="mb-2 text-sm text-slate-500">ยกเลิกแล้วระบบจะคืนที่นั่งครบทุกขา (ครั้งเดียว)</p>
-            <input wire:model="reason" class="field mb-2" placeholder="เหตุผล (ถ้ามี)">
+            <label class="label" for="cancel-reason">เหตุผลการยกเลิก (บันทึกภายใน ลูกค้าไม่เห็น)</label>
+            <input id="cancel-reason" wire:model="cancelReason" class="field mb-2" placeholder="เช่น ลูกค้าขอยกเลิกทางโทรศัพท์">
             <button wire:click="cancelBooking" wire:confirm="ยืนยันยกเลิกการจองนี้?" class="btn-line !border-pink !text-pink">ยกเลิกการจอง</button>
         </div>
     @endif

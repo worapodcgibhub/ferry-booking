@@ -100,7 +100,7 @@ it('หลังบ้านยกเลิกการจองไป–กล�
     expect($out->fresh()->seats_taken)->toBe(2)->and($ret->fresh()->seats_taken)->toBe(2);
 
     $this->actingAs($this->staff);
-    $c = Livewire::test(BookingDetail::class, ['booking' => $b])->set('reason', 'ลูกค้าขอยกเลิก')->call('cancelBooking')->assertSee('ยกเลิกการจองและคืนที่นั่งแล้ว');
+    $c = Livewire::test(BookingDetail::class, ['booking' => $b])->set('cancelReason', 'ลูกค้าขอยกเลิก')->call('cancelBooking')->assertSee('ยกเลิกการจองและคืนที่นั่งแล้ว');
     expect($b->fresh()->booking_status)->toBe('cancelled')->and($out->fresh()->seats_taken)->toBe(0)->and($ret->fresh()->seats_taken)->toBe(0);
 
     $c->call('cancelBooking'); // กดซ้ำ ต้องไม่คืนซ้ำ/ติดลบ และแจ้งว่ายกเลิกไม่ได้แล้ว
