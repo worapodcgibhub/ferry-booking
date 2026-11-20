@@ -51,13 +51,35 @@
     </div>
 
     @if ($line)
-        <div class="card mt-4 p-4" x-data="{ copied: false }">
+        {{-- navigator.clipboard ใช้ได้เฉพาะ HTTPS/localhost (http://xxx.test ไม่ใช่) จึงมีทางสำรองด้วย execCommand --}}
+        <div class="card mt-4 p-4" x-data="{
+            copied: false,
+            failed: false,
+            async copy() {
+                const t = this.$refs.t;
+                this.failed = false;
+                try {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(t.value);
+                    } else {
+                        t.focus(); t.select(); t.setSelectionRange(0, t.value.length);
+                        if (!document.execCommand('copy')) throw new Error('copy failed');
+                        t.setSelectionRange(0, 0); t.blur();
+                    }
+                    this.copied = true;
+                    setTimeout(() => this.copied = false, 2000);
+                } catch (e) {
+                    t.focus(); t.select();
+                    this.failed = true;
+                }
+            }
+        }">
             <h2 class="mb-2 font-extrabold">ข้อความสำหรับส่ง LINE (เจ้าหน้าที่ส่งเอง)</h2>
             <textarea x-ref="t" readonly rows="8" class="field font-mono text-sm">{{ $line }}</textarea>
-            <button type="button" class="btn-pink mt-2"
-                @click="navigator.clipboard.writeText($refs.t.value).then(() => { copied = true; setTimeout(() => copied = false, 2000) })">
+            <button type="button" class="btn-pink mt-2" @click="copy()">
                 <span x-show="!copied">คัดลอกข้อความ</span><span x-show="copied" x-cloak>คัดลอกแล้ว ✓</span>
             </button>
+            <p x-show="failed" x-cloak class="err">คัดลอกอัตโนมัติไม่ได้ ข้อความถูกเลือกไว้แล้ว กด Ctrl+C เพื่อคัดลอกเอง</p>
         </div>
     @endif
 
