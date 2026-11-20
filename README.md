@@ -1,6 +1,6 @@
 # เรือไปเกาะ — ระบบจองเรือหลายเกาะ (เฟส 1, ใช้ในเครื่อง)
 
-Laravel 13 · Livewire 4 · Tailwind 4 · Pest · ฐานข้อมูล MariaDB (ตอนนี้ใช้ SQLite ชั่วคราวระหว่างรอติดตั้ง MariaDB)
+Laravel 13 · Livewire 4 · Tailwind 4 · Pest · ฐานข้อมูล MariaDB (เทสต์ Pest ใช้ SQLite ในหน่วยความจำ)
 ข้อมูลทั้งหมดเป็นข้อมูลสมมติ บัญชีรับโอนและสลิปเป็นของทดสอบ ไม่ส่งอีเมลจริง (บันทึกลง `storage/logs/laravel.log`)
 
 ## เปิดใช้งาน
@@ -13,6 +13,16 @@ php artisan schedule:work  # (ไม่บังคับ) ให้ระบบ
 
 ติดตั้งใหม่: `composer install && npm install && npm run build && copy .env.example .env && php artisan key:generate`
 แล้วตั้ง DB ใน `.env` จากนั้น `php artisan migrate:fresh --seed` และ `php artisan storage:link`
+
+## ค่า PHP สำหรับอัปโหลดสลิป (สำคัญ)
+แอปจำกัดสลิปไม่เกิน **4 MB** (`config/ferry.php`) แต่ PHP ต้องรับไฟล์ได้อย่างน้อยเท่ากัน
+ถ้า `upload_max_filesize` ต่ำกว่านี้ (ค่าเริ่มต้นของ PHP คือ 2M) สลิป 2–4 MB จะอัปโหลดไม่สำเร็จ
+
+| วิธีรัน | สิ่งที่ต้องทำ |
+|---|---|
+| **Laravel Herd** | ตั้ง `upload_max_filesize` **≥ 5M** ใน `php.ini` ของ Herd (เปิดด้วย `herd ini` หรือดูที่ `~/.config/herd/bin/php85/php.ini`) แล้วรัน `herd restart php` — ค่านี้ใช้ร่วมกับทุกไซต์ใน Herd และ `.user.ini` ในโปรเจกต์ใช้ไม่ได้บน Herd |
+| **`php artisan serve`** | ไม่ต้องตั้งเพิ่ม ระบบโหลด `php-ini/ferry.ini` ของโปรเจกต์ให้เอง (`upload_max_filesize = 5M`, `post_max_size = 8M`) |
+| **Deploy จริง** | ตั้ง `upload_max_filesize` และ `post_max_size` **ไม่ต่ำกว่า 4M** (แนะนำ 5M และ 8M เผื่อส่วนหัว multipart) ถ้าใช้ nginx ให้ตั้ง `client_max_body_size` ≥ 8M ด้วย |
 
 ## บัญชีสาธิต (หลังบ้านที่ /login) — ใช้ทดสอบเท่านั้น
 > บัญชีเหล่านี้ใช้รหัสผ่านที่เดาง่าย **ใช้สำหรับทดสอบในเครื่องเท่านั้น** seeder จะสร้างเฉพาะเมื่อ `APP_ENV=local` หรือ `testing`
