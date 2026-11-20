@@ -49,4 +49,18 @@ php artisan schedule:work  # (ไม่บังคับ) ให้ระบบ
 - Payment Gateway และการตรวจยอดอัตโนมัติอยู่เฟส 2
 
 ## ทดสอบ
-`./vendor/bin/pest`
+`./vendor/bin/pest` (หรือ `php artisan test`) — ใช้ SQLite ในหน่วยความจำ ไม่แตะฐานข้อมูลจริง
+
+### ทดสอบแย่งที่นั่งสุดท้ายแบบหลายโปรเซสพร้อมกัน (MariaDB)
+เทสต์ Pest รันทีละคำขอ จึงพิสูจน์การจองพร้อมกันจริงไม่ได้ สคริปต์ `scripts/race-last-seat.php` สั่ง N โปรเซสจองรอบเรือที่เหลือ 1 ที่นั่ง
+**พร้อมกัน** (รอเวลาเริ่มร่วมกัน) ต้องได้ "จองสำเร็จ 1 ถูกปฏิเสธ N−1 ไม่มี error" และ `seats_taken = 1` ทุกรอบ
+
+1. สร้างฐานข้อมูลทดสอบแยก เช่น `ferry_booking_test` (มีคำสั่งอยู่ใน `database/setup/mariadb.sql`)
+2. ตั้งค่าเชื่อมต่อผ่านตัวแปรสภาพแวดล้อม แล้วรัน (ตัวอย่าง PowerShell):
+```powershell
+$env:DB_CONNECTION='mariadb'; $env:DB_DATABASE='ferry_booking_test'
+$env:DB_USERNAME='ferry_booking'; $env:DB_PASSWORD='รหัสผ่านของคุณ'
+php scripts/race-last-seat.php --processes=8 --rounds=3   # exit code 0 = ผ่านทุกรอบ
+```
+> ⚠ สคริปต์ล้างตารางทั้งฐาน (`migrate:fresh`) จึง **ปฏิเสธการรัน** ถ้าไม่ใช่ MariaDB/MySQL หรือชื่อฐานข้อมูลไม่ลงท้ายด้วย `_test`
+> (กันเผลอรันกับฐานข้อมูลจริง) ใช้ SQLite ไม่ได้เพราะแชร์ข้ามโปรเซสไม่ได้
