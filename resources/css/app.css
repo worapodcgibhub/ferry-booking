@@ -9,8 +9,25 @@
     --color-sea: #14b8c4;
     --color-sea-50: #e8f9fb;
     --color-sea-100: #c9f1f5;
+    --color-sea-150: #b3ebf1; /* เข้มกว่า sea-100 ขึ้นหนึ่งขั้น ใช้กับแถบหัวตารางเรือ + ป้ายเส้นทาง */
     --color-pink: #e5125d;
     --color-pink-50: #fdeef4;
+
+    /*
+     * ความโค้งของขอบ: รวมศูนย์ไว้ที่นี่ที่เดียว ปรับค่าตรงนี้แล้วทั้งเว็บ (ลูกค้า+หลังบ้าน) เปลี่ยนตามทันที
+     * ใช้ผ่านคลาส rounded-card / rounded-control / rounded-small / rounded-tag / rounded-micro
+     * วงกลมจริง (ตัวเลขขั้นตอน ปุ่มสลับ แถบขีด) ยังใช้ rounded-full ตามเดิม
+     *   card     การ์ดทั่วไป การ์ดค้นหา การ์ดรอบเรือ แท็บเกาะ        (เดิม 1rem  = 16px)
+     *   control  ช่องกรอก ปุ่ม กล่องแจ้งเตือน/ข้อมูล บล็อกไอคอน รูปย่อ (เดิม 0.75rem = 12px)
+     *   small    ลิงก์เมนูหลังบ้าน กล่องข้อมูลเล็ก                   (เดิม 0.5rem = 8px)
+     *   tag      ป้ายสถานะเล็ก (badge)                                (เดิมทรงแคปซูล 9999px)
+     *   micro    โลโก้ขนาดเล็กในแถบหลังบ้าน                          (เดิม 0.25rem = 4px)
+     */
+    --radius-card: 0.625rem;
+    --radius-control: 0.5rem;
+    --radius-small: 0.3125rem;
+    --radius-tag: 0.375rem;
+    --radius-micro: 0.1875rem;
 }
 
 @layer base {
@@ -21,11 +38,48 @@
 }
 
 @layer components {
-    .btn-pink { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-pink px-5 py-3 font-bold text-white shadow-sm transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed; }
-    .btn-line { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 font-semibold text-navy transition hover:bg-slate-50 disabled:opacity-50; }
-    .field { @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-navy focus:border-sea focus:outline-none focus:ring-2 focus:ring-sea/30; }
+    /*
+     * ม่านขาวใน hero ชั้นเดียว คลุมเต็ม hero ไม่มีขอบ/กรอบ — ปรับที่ตัวแปรชุดนี้ที่เดียว
+     *   --hero-veil-peak  ความขาวสูงสุด 0–1 (ที่ขอบซ้ายของเดสก์ท็อป / ขอบบนของมือถือ)
+     *   --hero-veil-end   ตำแหน่งที่จางหมดเป็นโปร่งใส (เดสก์ท็อป = % ของความกว้าง, มือถือ = % ของความสูง)
+     * จุดหยุดระหว่างทางคำนวณจาก peak/end อัตโนมัติ (สัดส่วนคงที่ ไล่เนียน)
+     * เดสก์ท็อป: ไล่ซ้าย→ขวา แล้ว mask จางทางแนวตั้ง (เต็มถึง --hero-veil-fade-from จางหมดที่ --hero-veil-fade-to ก่อนถึงแท็บเกาะ)
+     * มือถือ (< md): ข้อความกินเต็มความกว้าง จึงไล่บน→ล่างแทน ใช้ตัวแปรชุดเดียวกันแต่ค่าแยก
+     */
+    .hero-veil {
+        --hero-veil-peak: 0.85;
+        --hero-veil-end: 68%;
+        --hero-veil-fade-from: 50%;
+        --hero-veil-fade-to: 85%;
+        --hero-veil-dir: to right;
+        background: linear-gradient(var(--hero-veil-dir),
+            rgb(255 255 255 / var(--hero-veil-peak)) 0%,
+            rgb(255 255 255 / calc(var(--hero-veil-peak) * 0.897)) calc(var(--hero-veil-end) * 0.385),
+            rgb(255 255 255 / calc(var(--hero-veil-peak) * 0.655)) calc(var(--hero-veil-end) * 0.577),
+            rgb(255 255 255 / calc(var(--hero-veil-peak) * 0.431)) calc(var(--hero-veil-end) * 0.731),
+            rgb(255 255 255 / calc(var(--hero-veil-peak) * 0.138)) calc(var(--hero-veil-end) * 0.885),
+            rgb(255 255 255 / 0) var(--hero-veil-end));
+        -webkit-mask-image: linear-gradient(to bottom, #000 var(--hero-veil-fade-from), transparent var(--hero-veil-fade-to));
+        mask-image: linear-gradient(to bottom, #000 var(--hero-veil-fade-from), transparent var(--hero-veil-fade-to));
+    }
+    @media (max-width: 767px) {
+        .hero-veil {
+            --hero-veil-peak: 0.85;
+            --hero-veil-end: 68%;
+            --hero-veil-dir: to bottom;
+            -webkit-mask-image: none;
+            mask-image: none;
+        }
+    }
+    /* หัวข้อ/คำบรรยาย: glow ขาวบางตามตัวอักษร (ไม่มีกล่อง/พื้นรอง) */
+    .hero-desc { --hero-desc-glow-opacity: 0.9; --hero-desc-glow-blur: 6px; text-shadow: 0 0 var(--hero-desc-glow-blur) rgb(255 255 255 / var(--hero-desc-glow-opacity)), 0 0 var(--hero-desc-glow-blur) rgb(255 255 255 / var(--hero-desc-glow-opacity)); }
+    .hero-title { --hero-title-glow-opacity: 1; --hero-title-glow-blur: 10px; text-shadow: 0 0 var(--hero-title-glow-blur) rgb(255 255 255 / var(--hero-title-glow-opacity)); }
+
+    .btn-pink { @apply inline-flex items-center justify-center gap-2 rounded-control bg-pink px-5 py-3 font-bold text-white shadow-sm transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed; }
+    .btn-line { @apply inline-flex items-center justify-center gap-2 rounded-control border border-slate-300 bg-white px-4 py-2 font-semibold text-navy transition hover:bg-slate-50 disabled:opacity-50; }
+    .field { @apply w-full rounded-control border border-slate-300 bg-white px-3 py-2.5 text-navy focus:border-sea focus:outline-none focus:ring-2 focus:ring-sea/30; }
     .label { @apply mb-1 block text-sm font-semibold text-navy; }
-    .card { @apply rounded-2xl border border-slate-200 bg-white shadow-sm; }
+    .card { @apply rounded-card border border-slate-200 bg-white shadow-sm; }
     .err { @apply mt-1 text-sm text-pink; }
-    .badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold; }
+    .badge { @apply inline-flex items-center rounded-tag px-2.5 py-0.5 text-xs font-bold; }
 }

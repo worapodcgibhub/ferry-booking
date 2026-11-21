@@ -1,5 +1,5 @@
 @php($ok = $t->isBookable($pax))
-<div class="mb-3 flex flex-wrap items-center gap-3 rounded-2xl border-2 p-4 {{ $ok ? 'border-slate-200 bg-white' : 'border-slate-200 bg-slate-100 text-slate-500' }}" wire:key="trip-{{ $action }}-{{ $t->id }}">
+<div class="mb-3 flex flex-wrap items-center gap-3 rounded-card border-2 p-4 {{ $ok ? 'border-slate-200 bg-white' : 'border-slate-200 bg-slate-100 text-slate-500' }}" wire:key="trip-{{ $action }}-{{ $t->id }}">
     <div class="min-w-[6.5rem] flex-1 sm:flex-none sm:min-w-[9rem]">
         <div class="text-xs font-bold text-slate-500">{{ $route->origin->name }}</div>
         <div class="text-2xl font-extrabold">{{ $t->departs_at->format('H:i') }} น.</div>

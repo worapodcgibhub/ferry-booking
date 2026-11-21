@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-extrabold">ท่าเรือและจุดขึ้นเรือ</h1>
         <button wire:click="create" class="btn-pink">+ เพิ่มท่าเรือ</button>
     </div>
-    @if ($flash)<div class="mb-3 rounded-xl bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
+    @if ($flash)<div class="mb-3 rounded-control bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
 
     @if ($showForm)
         <form wire:submit="save" class="card mb-5 grid gap-3 p-4 md:grid-cols-2">

@@ -4,7 +4,7 @@
         <button wire:click="create" class="btn-pink">+ เพิ่มเส้นทาง</button>
     </div>
     <p class="mb-3 text-sm text-slate-500">เส้นทางกำหนดจากท่าต้นทางไปท่าปลายทาง รองรับทั้งฝั่งไปเกาะ เกาะกลับฝั่ง และเกาะไปเกาะ</p>
-    @if ($flash)<div class="mb-3 rounded-xl bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
+    @if ($flash)<div class="mb-3 rounded-control bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
 
     @if ($showForm)
         <form wire:submit="save" class="card mb-5 grid gap-3 p-4 md:grid-cols-2">

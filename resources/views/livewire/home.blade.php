@@ -2,12 +2,13 @@
     {{-- ภาพปก: เปลี่ยนพร้อมชื่อเกาะ/ปลายทาง/รอบเรือ เมื่อสลับเกาะ --}}
     <section class="relative">
         <div wire:key="cover-{{ $island?->id }}" class="relative h-[26rem] overflow-hidden bg-sea-100 md:h-[30rem]">
-            <img src="{{ $island?->cover_url }}" alt="{{ $island?->name }}" class="absolute inset-0 h-full w-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-b from-white/50 via-transparent to-transparent"></div>
+            <img data-hero-cover src="{{ $island?->cover_url }}" alt="{{ $island?->name }}" class="absolute inset-0 h-full w-full object-cover">
+            {{-- ม่านขาวชั้นเดียวคลุมทั้ง hero (ไล่ซ้าย→ขวา; มือถือไล่บน→ล่าง): ค่าอยู่ที่ .hero-veil ใน app.css (--hero-veil-peak / --hero-veil-end) --}}
+            <div class="hero-veil absolute inset-0"></div>
             <div class="relative mx-auto max-w-6xl px-4 pt-8 md:pt-12">
-                <h1 class="text-5xl font-extrabold leading-tight text-navy drop-shadow-sm md:text-7xl">{{ $island?->headline_text ?? 'จองเรือไปเกาะ' }}</h1>
+                <h1 class="hero-title text-5xl font-extrabold leading-tight text-navy md:text-7xl">{{ $island?->headline_text ?? 'จองเรือไปเกาะ' }}</h1>
                 <div class="mt-2 h-2 w-40 rounded-full bg-sea/80 md:w-64"></div>
-                @if ($island?->description)<p class="mt-3 max-w-lg font-semibold text-navy/80">{{ $island->description }}</p>@endif
+                @if ($island?->description)<p class="hero-desc mt-3 max-w-lg text-lg font-semibold text-navy/80 md:text-xl">{{ $island->description }}</p>@endif
             </div>
         </div>
 
@@ -16,7 +17,7 @@
             <div class="mb-3 flex flex-wrap gap-2">
                 @foreach ($islands as $i)
                     <button type="button" wire:click="selectIsland('{{ $i->slug }}')" wire:key="tab-{{ $i->id }}"
-                        class="flex items-center gap-2 rounded-2xl px-5 py-3 text-lg font-extrabold shadow transition {{ $i->id === $island?->id ? 'bg-pink text-white' : 'bg-white text-navy hover:bg-pink-50' }}">
+                        class="flex items-center gap-2 rounded-card px-5 py-3 text-lg font-extrabold shadow transition {{ $i->id === $island?->id ? 'bg-pink text-white' : 'bg-white text-navy hover:bg-pink-50' }}">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22V10M12 10C9 9 6 10 4 12M12 10c3-1 6 0 8 2M12 10c0-3-2-5-5-5M12 10c0-3 2-5 5-5"/></svg>
                         {{ $i->name }}
                     </button>
@@ -86,13 +87,13 @@
     <section id="schedule" class="mx-auto mt-10 max-w-6xl px-4">
         <div class="mb-3 flex items-center justify-between">
             <h2 class="text-2xl font-extrabold">ตารางเรือ {{ $island?->name }}</h2>
-            @if ($route)<span class="badge bg-sea-100 text-navy">{{ $route->label }}</span>@endif
+            @if ($route)<span class="badge bg-sea-150 text-navy">{{ $route->label }}</span>@endif
         </div>
         <div class="card overflow-hidden">
             @if ($trips->isEmpty())
                 <p class="p-6 text-slate-500">ยังไม่มีรอบเรือที่เปิดจองสำหรับเส้นทางนี้</p>
             @else
-                <p class="bg-sea-100 px-4 py-2 text-sm font-bold">รอบวันที่ {{ thai_date($scheduleDate) }}</p>
+                <p class="bg-sea-150 px-4 py-2 text-sm font-bold">รอบวันที่ {{ thai_date($scheduleDate) }}</p>
                 <div class="divide-y">
                     @foreach ($trips as $t)
                         <div class="flex items-center gap-3 px-4 py-3" wire:key="t-{{ $t->id }}">
@@ -114,7 +115,7 @@
         <div class="grid gap-4 md:grid-cols-2">
             @foreach ($guidePorts as $p)
                 <div class="card flex gap-4 p-4" wire:key="p-{{ $p->id }}">
-                    <div class="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-sea-100 text-sea">
+                    <div class="flex h-24 w-24 shrink-0 items-center justify-center rounded-control bg-sea-100 text-sea">
                         <svg class="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
                     </div>
                     <div class="min-w-0">

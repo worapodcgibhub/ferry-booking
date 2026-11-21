@@ -14,7 +14,7 @@
 <div class="flex min-h-screen">
     <aside class="fixed inset-y-0 left-0 z-40 w-60 -translate-x-full bg-navy text-white transition md:static md:translate-x-0" :class="{ 'translate-x-0': menu }">
         <div class="flex items-center gap-2 px-4 py-4">
-            <x-ship-logo class="h-8 w-8 rounded bg-white p-0.5" />
+            <x-ship-logo class="h-8 w-8 rounded-micro bg-white p-0.5" />
             <span class="text-lg font-extrabold">หลังบ้าน</span>
         </div>
         <nav class="flex flex-col gap-1 px-2 text-sm font-semibold">
@@ -32,7 +32,7 @@
             @endphp
             @foreach ($items as [$r, $label, $ownerOnly])
                 @if (! $ownerOnly || $u->isOwner())
-                    <a href="{{ route($r) }}" class="rounded-lg px-3 py-2 hover:bg-white/10 {{ request()->routeIs($r.'*') ? 'bg-white/15' : '' }}">{{ $label }}</a>
+                    <a href="{{ route($r) }}" class="rounded-small px-3 py-2 hover:bg-white/10 {{ request()->routeIs($r.'*') ? 'bg-white/15' : '' }}">{{ $label }}</a>
                 @endif
             @endforeach
         </nav>

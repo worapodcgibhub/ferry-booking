@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-extrabold">เกาะและพื้นที่</h1>
         <button wire:click="create" class="btn-pink">+ เพิ่มเกาะ</button>
     </div>
-    @if ($flash)<div class="mb-3 rounded-xl bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
+    @if ($flash)<div class="mb-3 rounded-control bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
 
     @if ($showForm)
         <form wire:submit="save" class="card mb-5 grid gap-3 p-4 md:grid-cols-2">
@@ -27,8 +27,8 @@
                 <div wire:loading wire:target="cover" class="text-sm text-slate-500">กำลังอัปโหลด…</div>
                 @error('cover')<p class="err">{{ $message }}</p>@enderror
                 <div class="mt-2 flex gap-3">
-                    @if ($cover)<img src="{{ $cover->temporaryUrl() }}" class="h-24 rounded-xl object-cover" alt="ตัวอย่างรูปปกใหม่">
-                    @elseif ($currentCover)<img src="{{ $currentCover }}" class="h-24 rounded-xl object-cover" alt="รูปปกปัจจุบัน">@endif
+                    @if ($cover)<img src="{{ $cover->temporaryUrl() }}" class="h-24 rounded-control object-cover" alt="ตัวอย่างรูปปกใหม่">
+                    @elseif ($currentCover)<img src="{{ $currentCover }}" class="h-24 rounded-control object-cover" alt="รูปปกปัจจุบัน">@endif
                 </div>
             </div>
             <div class="flex gap-2 md:col-span-2"><button class="btn-pink" wire:loading.attr="disabled" wire:target="save,cover">บันทึก</button><button type="button" wire:click="resetForm" class="btn-line">ยกเลิก</button></div>

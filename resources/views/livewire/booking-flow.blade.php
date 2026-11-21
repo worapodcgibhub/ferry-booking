@@ -33,7 +33,7 @@
         </div>
 
         @if ($notice)
-            <div class="mb-4 rounded-xl border border-pink bg-pink-50 p-3 font-semibold text-pink" role="alert">{{ $notice }}</div>
+            <div class="mb-4 rounded-control border border-pink bg-pink-50 p-3 font-semibold text-pink" role="alert">{{ $notice }}</div>
         @endif
 
         @if ($step === 'outbound')

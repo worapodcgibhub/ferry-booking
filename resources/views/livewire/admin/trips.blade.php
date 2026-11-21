@@ -1,7 +1,7 @@
 <div>
     <h1 class="mb-4 text-2xl font-extrabold">รอบเรือ</h1>
-    @if ($flash)<div class="mb-3 rounded-xl bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
-    @if ($error)<div class="mb-3 rounded-xl bg-pink-50 p-3 font-semibold text-pink">{{ $error }}</div>@endif
+    @if ($flash)<div class="mb-3 rounded-control bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
+    @if ($error)<div class="mb-3 rounded-control bg-pink-50 p-3 font-semibold text-pink">{{ $error }}</div>@endif
 
     <form wire:submit="generate" class="card mb-5 grid gap-3 p-4 md:grid-cols-6">
         <h2 class="font-extrabold md:col-span-6">สร้างรอบเรือเป็นชุด</h2>

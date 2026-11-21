@@ -15,7 +15,7 @@
                 </div>
                 <button class="btn-pink w-full">เข้าสู่ระบบ</button>
             </form>
-            <p class="mt-4 rounded-lg bg-sea-50 p-3 text-xs text-slate-600">
+            <p class="mt-4 rounded-small bg-sea-50 p-3 text-xs text-slate-600">
                 บัญชีสาธิต (ในเครื่องเท่านั้น):<br>
                 เจ้าของระบบ <b>owner@demo.test</b> / <b>password</b><br>
                 เจ้าหน้าที่ <b>staff@demo.test</b> / <b>password</b>

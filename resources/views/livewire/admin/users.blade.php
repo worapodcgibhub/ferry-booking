@@ -1,8 +1,8 @@
 <div>
     <h1 class="mb-4 text-2xl font-extrabold">ผู้ใช้งาน</h1>
     <p class="mb-3 text-sm text-slate-500">มี 2 บทบาท: เจ้าของระบบ (จัดการทุกอย่าง) และเจ้าหน้าที่ (ตรวจยอด ยืนยัน ยกเลิก ดูผู้โดยสาร)</p>
-    @if ($flash)<div class="mb-3 rounded-xl bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
-    @if ($error)<div class="mb-3 rounded-xl bg-pink-50 p-3 font-semibold text-pink">{{ $error }}</div>@endif
+    @if ($flash)<div class="mb-3 rounded-control bg-green-50 p-3 font-semibold text-green-800">{{ $flash }}</div>@endif
+    @if ($error)<div class="mb-3 rounded-control bg-pink-50 p-3 font-semibold text-pink">{{ $error }}</div>@endif
 
     <form wire:submit="create" class="card mb-5 grid gap-3 p-4 md:grid-cols-4">
         <div><label class="label">ชื่อ</label><input wire:model="name" class="field">@error('name')<p class="err">{{ $message }}</p>@enderror</div>
