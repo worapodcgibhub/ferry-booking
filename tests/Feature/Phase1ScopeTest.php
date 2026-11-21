@@ -46,13 +46,18 @@ function scopeSlip(Booking $b, ?int $amount = null): void
 
 // ---------- 1) สลับเกาะ: ภาพปก/ชื่อ/ปลายทาง/รอบเรือเปลี่ยนพร้อมกัน เก็บวันที่-จำนวนคน-ต้นทาง ----------
 it('สลับเกาะ: ภาพปก ชื่อเกาะ ปลายทาง และตารางเรือเปลี่ยนใน render เดียวกัน', function () {
+    // ภาพปกหลักระบุด้วย data-hero-cover (ไม่ผูกกับชื่อไฟล์ภาพ เปลี่ยนภาพปกได้โดยเทสต์ไม่พัง)
+    $hero = fn ($c) => preg_match('/<img[^>]*data-hero-cover[^>]*src="([^"]+)"/', $c->html(), $m) ? $m[1] : null;
+    $coverOf = fn (string $slug) => \App\Models\Island::where('slug', $slug)->first()->cover_url;
+
     $c = Livewire::test(Home::class)->set('departDate', now()->addDays(4)->toDateString())->set('passengers', 3)
-        ->assertSeeHtml('images/covers/kood.svg')->assertSee('ไปเกาะกูด')->assertSee('ท่าเรือเกาะกูด')->assertSee('450');
+        ->assertSee('ไปเกาะกูด')->assertSee('ท่าเรือเกาะกูด')->assertSee('450');
+    expect($hero($c))->toBe($coverOf('koh-kood'));
 
     $c->call('selectIsland', 'koh-mak')
-        ->assertSeeHtml('images/covers/mak.svg')->assertDontSeeHtml('images/covers/kood.svg')
         ->assertSee('ไปเกาะหมาก')->assertSee('ท่าเรือเกาะหมาก')->assertDontSee('ท่าเรือเกาะกูด')->assertSee('400')
         ->assertSet('departDate', now()->addDays(4)->toDateString())->assertSet('passengers', 3);
+    expect($hero($c))->toBe($coverOf('koh-mak'))->not->toBe($coverOf('koh-kood'));
 });
 
 // ---------- 2) ยอดคำนวณฝั่งเซิร์ฟเวอร์ ไม่เชื่อค่าจากลูกค้า ----------

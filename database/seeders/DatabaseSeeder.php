@@ -9,10 +9,26 @@ use App\Models\Route;
 use App\Models\User;
 use App\Services\TripGenerator;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 /** ข้อมูลสาธิตทั้งหมดเป็นข้อมูลสมมติ ใช้ในเครื่องเท่านั้น */
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * คัดลอกภาพปกสาธิต (database/seeders/demo-images, เครดิตอยู่ใน CREDITS.md และ config/ferry.php)
+     * เข้า storage ถ้ายังไม่มี เพื่อให้ migrate:fresh --seed แล้วภาพไม่หาย คืนค่าพาธแบบที่เก็บในฐานข้อมูล
+     */
+    private function installDemoCover(string $file): string
+    {
+        $target = 'covers/'.$file;
+        $disk = Storage::disk('public');
+        if (! $disk->exists($target)) {
+            $disk->put($target, file_get_contents(database_path('seeders/demo-images/'.$file)));
+        }
+
+        return $target;
+    }
+
     public function run(): void
     {
         // บัญชีสาธิตใช้รหัสผ่านที่เดาง่าย จึงสร้างเฉพาะ local และ testing เท่านั้น (ห้ามมีบน production/staging)
@@ -26,12 +42,12 @@ class DatabaseSeeder extends Seeder
 
         $kood = Island::firstOrCreate(['slug' => 'koh-kood'], [
             'area_id' => $area->id, 'name' => 'เกาะกูด', 'headline' => 'ไปเกาะกูด', 'sort_order' => 1,
-            'cover_path' => 'images/covers/kood.svg',
+            'cover_path' => $this->installDemoCover('koh-kood.jpg'),
             'description' => 'เกาะใหญ่อันดับสองของไทย ทะเลใส หาดขาว',
         ]);
         $mak = Island::firstOrCreate(['slug' => 'koh-mak'], [
             'area_id' => $area->id, 'name' => 'เกาะหมาก', 'headline' => 'ไปเกาะหมาก', 'sort_order' => 2,
-            'cover_path' => 'images/covers/mak.svg',
+            'cover_path' => $this->installDemoCover('koh-mak.jpg'),
             'description' => 'เกาะเงียบสงบ เหมาะพักผ่อนช้า ๆ',
         ]);
 
