@@ -6,6 +6,7 @@ use App\Models\Island;
 use App\Models\Port;
 use App\Models\Route;
 use App\Models\Trip;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -20,6 +21,8 @@ class Home extends Component
     public string $tripType = 'round';
     public ?string $departDate = null;
     public ?string $returnDate = null;
+    /** true เฉพาะเมื่อผู้ใช้แก้ช่องวันกลับเองจริง (updatedReturnDate ถูกเรียกจากฝั่งเบราว์เซอร์ ไม่ใช่เมื่อโค้ดตั้งค่าให้) */
+    public bool $returnTouched = false;
     public int $passengers = 2;
 
     public function mount(): void
@@ -27,7 +30,7 @@ class Home extends Component
         $island = $this->island();
         $this->islandSlug = $island?->slug;
         $this->departDate ??= now()->addDays(7)->toDateString();
-        $this->returnDate ??= now()->addDays(9)->toDateString();
+        $this->returnDate ??= Carbon::parse($this->departDate)->addDay()->toDateString();
         $this->syncRoute(null, null);
     }
 
@@ -52,6 +55,42 @@ class Home extends Component
     {
         $this->islandSlug = $slug;
         $this->syncRoute($this->originId, $this->destinationId);
+    }
+
+    /**
+     * เปลี่ยนวันไป: ถ้าผู้ใช้ยังไม่แตะช่องวันกลับ ให้วันกลับ = วันไป+1 เสมอ
+     * ถ้าแตะแล้ว ไม่เขียนทับ ยกเว้นว่างหรือก่อนวันไป จึงขยับเป็นวันไป+1
+     */
+    public function updatedDepartDate(): void
+    {
+        $this->syncReturnDate();
+    }
+
+    /** ผู้ใช้เลือก/พิมพ์วันกลับเอง (Livewire เรียก hook นี้เฉพาะเมื่อค่ามาจากเบราว์เซอร์) */
+    public function updatedReturnDate(): void
+    {
+        $this->returnTouched = true;
+    }
+
+    public function updatedTripType(): void
+    {
+        $this->syncReturnDate();
+    }
+
+    private function syncReturnDate(): void
+    {
+        if ($this->tripType !== 'round') {
+            return;
+        }
+        try {
+            $depart = $this->departDate ? Carbon::createFromFormat('!Y-m-d', $this->departDate) : null;
+            $return = $this->returnDate ? Carbon::createFromFormat('!Y-m-d', $this->returnDate) : null;
+        } catch (\Throwable) {
+            return; // รูปแบบวันที่ผิด ปล่อยให้ validate() ใน search() ตอบ
+        }
+        if ($depart && (! $this->returnTouched || ! $return || $return->lt($depart))) {
+            $this->returnDate = $depart->copy()->addDay()->toDateString();
+        }
     }
 
     public function updatedOriginId(): void
