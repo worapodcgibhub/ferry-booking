@@ -29,7 +29,7 @@ class Home extends Component
     {
         $island = $this->island();
         $this->islandSlug = $island?->slug;
-        $this->departDate ??= now()->addDays(7)->toDateString();
+        $this->departDate ??= now()->toDateString();
         $this->returnDate ??= Carbon::parse($this->departDate)->addDay()->toDateString();
         $this->syncRoute(null, null);
     }

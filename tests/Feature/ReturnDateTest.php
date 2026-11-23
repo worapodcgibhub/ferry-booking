@@ -15,17 +15,18 @@ function day(int $n): string
 }
 
 it('ค่าเริ่มต้นตอนโหลดหน้า: วันกลับ = วันไป+1 และยังไม่ถือว่าผู้ใช้แตะ', function () {
-    Livewire::test(Home::class)->assertSet('departDate', day(7))->assertSet('returnDate', day(8))->assertSet('returnTouched', false);
+    Livewire::test(Home::class)->assertSet('departDate', day(0))->assertSet('returnDate', day(1))->assertSet('returnTouched', false);
 });
 
 it('ช่องวันกลับมี min เท่ากับวันไป และเปลี่ยนตามเมื่อเลือกวันไปใหม่', function () {
-    Livewire::test(Home::class)->assertSeeHtml('min="'.day(7).'"')
+    Livewire::test(Home::class)->assertSeeHtml('min="'.day(0).'"')
         ->set('departDate', day(20))->assertSeeHtml('id="d2"')->assertSeeHtml('min="'.day(20).'"');
 });
 
 it('ยังไม่แตะวันกลับ: เปลี่ยนวันไปกี่ครั้ง วันกลับ = วันไป+1 เสมอ (รวมกรณีวันกลับเดิมยังไม่ก่อนวันไป)', function () {
     Livewire::test(Home::class)
-        ->set('departDate', day(3))->assertSet('returnDate', day(4))   // วันกลับเดิม day(8) ยังหลังวันไป แต่ผู้ใช้ไม่เคยแตะ
+        ->set('departDate', day(10))->assertSet('returnDate', day(11))
+        ->set('departDate', day(3))->assertSet('returnDate', day(4))   // วันกลับเดิม day(11) ยังหลังวันไป แต่ผู้ใช้ไม่เคยแตะ
         ->set('departDate', day(30))->assertSet('returnDate', day(31))
         ->set('departDate', day(12))->assertSet('returnDate', day(13))
         ->assertSet('returnTouched', false);
@@ -53,7 +54,7 @@ it('ยังอนุญาตให้กลับวันเดียวก�
 
 it('สลับเที่ยวเดียว→ไป-กลับ ตอนยังไม่แตะวันกลับ: วันกลับ = วันไป+1', function () {
     Livewire::test(Home::class)->set('tripType', 'oneway')->set('departDate', day(30))
-        ->assertSet('returnDate', day(8))                                // โหมดเที่ยวเดียวไม่แตะวันกลับ
+        ->assertSet('returnDate', day(1))                                // โหมดเที่ยวเดียวไม่แตะวันกลับ
         ->set('tripType', 'round')->assertSet('returnDate', day(31));
 });
 
