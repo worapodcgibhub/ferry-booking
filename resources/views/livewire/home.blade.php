@@ -56,14 +56,12 @@
                 <div class="col-span-1 {{ $tripType === 'round' ? 'md:col-span-3' : 'md:col-span-4' }}">
                     <label class="label" for="d1">วันเดินทาง{{ $tripType === 'round' ? 'ไป' : '' }}</label>
                     <input id="d1" type="date" wire:model.live="departDate" min="{{ now()->toDateString() }}" class="field">
-                    <p class="text-xs text-slate-500">{{ thai_date($departDate) }}</p>
                     @error('departDate')<p class="err">{{ $message }}</p>@enderror
                 </div>
                 @if ($tripType === 'round')
                     <div class="col-span-1 md:col-span-3">
                         <label class="label" for="d2">วันเดินทางกลับ</label>
                         <input id="d2" type="date" wire:model.live="returnDate" min="{{ $departDate }}" class="field">
-                        <p class="text-xs text-slate-500">{{ thai_date($returnDate) }}</p>
                         @error('returnDate')<p class="err">{{ $message }}</p>@enderror
                     </div>
                 @endif
