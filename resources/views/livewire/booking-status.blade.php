@@ -31,8 +31,14 @@
         @if ($booking->booking_status === 'confirmed')
             <p class="mt-4 rounded-control bg-green-50 p-4 font-semibold text-green-800">ทีมงานตรวจยอดและยืนยันแล้ว เราส่งอีเมลยืนยันพร้อมเลขจองไปที่ {{ $booking->contact_email }} แล้ว กรุณามาถึงท่าก่อนเรือออกอย่างน้อย 30 นาที</p>
         @elseif (in_array($booking->booking_status, ['cancelled', 'expired']))
-            <p class="mt-4 rounded-control bg-slate-100 p-4">{{ $booking->booking_status === 'expired' ? 'เลยเวลาแจ้งโอน ระบบคืนที่นั่งแล้ว หากยังต้องการเดินทางกรุณาจองใหม่' : 'การจองนี้ถูกยกเลิกและคืนที่นั่งแล้ว' }}
-                <a href="{{ route('home') }}" class="font-bold text-pink underline">กลับหน้าแรก</a></p>
+            <div class="mt-4 rounded-control bg-slate-100 p-4">
+                @if ($booking->booking_status === 'expired')
+                    <p class="font-semibold">การจองนี้หมดเวลาแจ้งโอน{{ $booking->expires_at ? 'เมื่อ '.thai_datetime($booking->expires_at).' น.' : '' }} ระบบคืนที่นั่งแล้ว ลิงก์นี้แจ้งโอนไม่ได้อีก หากยังต้องการเดินทางกรุณาจองใหม่</p>
+                @else
+                    <p class="font-semibold">การจองนี้ถูกยกเลิกและคืนที่นั่งแล้ว</p>
+                @endif
+                <a href="{{ route('home') }}" class="btn-pink mt-3 w-full py-3 text-lg">จองใหม่ ›</a>
+            </div>
         @elseif ($booking->payment_status === 'submitted')
             <p class="mt-4 rounded-control bg-sky-50 p-4 font-semibold text-sky-900">เรารับสลิปแล้ว ขณะนี้รอทีมงานตรวจยอดเงินเข้าบัญชี เมื่อยืนยันแล้วจะส่งเลขจองทางอีเมล {{ $booking->contact_email }}</p>
         @else
@@ -51,6 +57,15 @@
                     (เหลือ <span x-text="Math.floor(left/60) + ' นาที ' + (left%60) + ' วินาที'"></span>) มิฉะนั้นระบบจะคืนที่นั่ง
                 </p>
                 <p class="text-xs text-amber-700">ข้อมูลบัญชีนี้เป็นข้อมูลทดสอบในเครื่องเท่านั้น</p>
+            </div>
+
+            <div class="mt-4 rounded-control bg-sea-50 p-4 text-sm" x-data="{ copied: false }">
+                <p class="font-semibold">ถ้าโอนทีหลัง ให้กลับมาที่หน้านี้ภายใน {{ thai_datetime($booking->expires_at) }} น.</p>
+                <p class="mt-1 text-slate-600">เก็บลิงก์นี้ไว้ หรือกลับมาได้ทุกเมื่อที่ <a href="{{ route('booking.lookup') }}" class="font-bold text-pink underline">ตรวจสอบการจอง / แจ้งโอนเงิน</a> ด้วยเลขอ้างอิง {{ $booking->reference }} และเบอร์โทรหรืออีเมลที่ใช้จอง</p>
+                <button type="button" class="btn-line mt-2"
+                    @click="navigator.clipboard.writeText('{{ route('booking.show', $booking->access_token) }}').then(() => { copied = true; setTimeout(() => copied = false, 2000) })">
+                    <span x-show="!copied">คัดลอกลิงก์หน้านี้</span><span x-show="copied" x-cloak>คัดลอกแล้ว ✓</span>
+                </button>
             </div>
 
             @if ($booking->payment_status === 'rejected')

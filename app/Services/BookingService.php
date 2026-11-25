@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\BookingException;
 use App\Mail\BookingConfirmedMail;
+use App\Mail\BookingReceivedMail;
 use App\Models\Booking;
 use App\Models\BookingLeg;
 use App\Models\Payment;
@@ -36,7 +37,7 @@ class BookingService
         }
 
         try {
-            return DB::transaction(function () use ($data, $passengers) {
+            $created = DB::transaction(function () use ($data, $passengers) {
                 // ล็อกแถวรอบเรือเป็นคำสั่งแรกของธุรกรรม (เรียงตาม id กัน deadlock) ก่อนอ่านหรือแก้อย่างอื่น
                 // ถ้าอ่านแบบธรรมดาก่อน MariaDB (snapshot isolation) จะตอบ 1020 "Record has changed since last read"
                 // เมื่อมีคำขออื่นแก้แถวเดียวกันพร้อมกัน แทนที่จะรอคิวแล้วเห็นว่าที่นั่งเต็ม
@@ -89,12 +90,28 @@ class BookingService
 
                 return $booking->fresh('legs');
             }, 3); // ชนกันกับคำขออื่น (deadlock) ให้ลองใหม่ได้สูงสุด 3 ครั้ง
+
+            $this->sendReceivedMail($created);
+
+            return $created;
         } catch (UniqueConstraintViolationException $e) {
             // ส่งซ้ำพร้อมกัน: อีกคำขอสร้างเลขจองไปแล้ว ให้คืนเลขเดิม
             if ($existing = Booking::where('idempotency_key', $data['idempotency_key'])->first()) {
                 return $existing;
             }
             throw $e;
+        }
+    }
+
+    /** ส่งหลัง commit แล้วเท่านั้น ถ้าส่งไม่สำเร็จให้บันทึก log และการจองยังสำเร็จตามปกติ */
+    private function sendReceivedMail(Booking $booking): void
+    {
+        try {
+            Mail::to($booking->contact_email)->send(new BookingReceivedMail(
+                $booking->fresh(['legs.trip.route.origin', 'legs.trip.route.destination'])
+            ));
+        } catch (\Throwable $e) {
+            report($e);
         }
     }
 

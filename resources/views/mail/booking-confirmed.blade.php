@@ -12,5 +12,6 @@
         </p>
     @endforeach
     <p>จำนวนผู้โดยสาร: {{ $booking->passengers }} คน · ยอดรวม {{ number_format($booking->total_amount) }} บาท</p>
+    <p>ดูสถานะการจอง: <a href="{{ route('booking.show', $booking->access_token) }}">{{ route('booking.show', $booking->access_token) }}</a> (ลิงก์ส่วนตัว อย่าแชร์ให้ผู้อื่น)</p>
     <p>กรุณามาถึงท่าก่อนเวลาเรือออกอย่างน้อย 30 นาที และแสดงเลขจองต่อเจ้าหน้าที่</p>
 </div>
