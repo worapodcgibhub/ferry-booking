@@ -59,13 +59,10 @@
                 <p class="text-xs text-amber-700">ข้อมูลบัญชีนี้เป็นข้อมูลทดสอบในเครื่องเท่านั้น</p>
             </div>
 
-            <div class="mt-4 rounded-control bg-sea-50 p-4 text-sm" x-data="{ copied: false }">
+            <div class="mt-4 rounded-control bg-sea-50 p-4 text-sm">
                 <p class="font-semibold">ถ้าโอนทีหลัง ให้กลับมาที่หน้านี้ภายใน {{ thai_datetime($booking->expires_at) }} น.</p>
                 <p class="mt-1 text-slate-600">เก็บลิงก์นี้ไว้ หรือกลับมาได้ทุกเมื่อที่ <a href="{{ route('booking.lookup') }}" class="font-bold text-pink underline">ตรวจสอบการจอง / แจ้งโอนเงิน</a> ด้วยเลขอ้างอิง {{ $booking->reference }} และเบอร์โทรหรืออีเมลที่ใช้จอง</p>
-                <button type="button" class="btn-line mt-2"
-                    @click="navigator.clipboard.writeText('{{ route('booking.show', $booking->access_token) }}').then(() => { copied = true; setTimeout(() => copied = false, 2000) })">
-                    <span x-show="!copied">คัดลอกลิงก์หน้านี้</span><span x-show="copied" x-cloak>คัดลอกแล้ว ✓</span>
-                </button>
+                <x-copy-box class="mt-2" :text="route('booking.show', $booking->access_token)" label="คัดลอกลิงก์หน้านี้" btn-class="btn-line" />
             </div>
 
             @if ($booking->payment_status === 'rejected')

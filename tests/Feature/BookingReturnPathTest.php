@@ -107,3 +107,43 @@ it('BookingConfirmedMail มีลิงก์หน้าสถานะขอ�
 
     Mail::assertSent(BookingConfirmedMail::class, fn ($m) => str_contains($m->render(), route('booking.show', $b->access_token)));
 });
+
+// ---- ปุ่มคัดลอก: ใช้ตัวช่วยกลางตัวเดียว ที่ใช้ได้บน HTTP (ไม่ใช่ HTTPS) ----
+
+it('ปุ่มคัดลอกลิงก์บนหน้าสถานะใช้ตัวช่วยกลาง: มีตัวสำรอง execCommand และช่องลิงก์ให้กด Ctrl+C เมื่อคัดลอกไม่ได้', function () {
+    Mail::fake();
+    $b = returnPathBooking();
+    $link = route('booking.show', $b->access_token);
+
+    $html = Livewire::test(BookingStatus::class, ['token' => $b->access_token])
+        ->assertSee('คัดลอกลิงก์หน้านี้')->html();
+
+    expect($html)->toContain("document.execCommand('copy')")
+        ->and($html)->toContain('window.isSecureContext')
+        ->and($html)->toContain('data-copy-source')
+        ->and($html)->toContain('กด Ctrl+C เพื่อคัดลอกเอง')
+        ->and($html)->toContain('คัดลอกแล้ว')
+        ->and($html)->toMatch('/<textarea[^>]*data-copy-source[^>]*x-show="failed"[^>]*>\s*'.preg_quote(e($link), '/').'\s*<\/textarea>/');
+});
+
+it('ปุ่มคัดลอกข้อความ LINE ของแอดมินใช้ตัวช่วยกลางเดียวกัน (ช่องข้อความแสดงเสมอ)', function () {
+    Mail::fake();
+    $b = returnPathBooking();
+    $b->update(['booking_status' => 'confirmed', 'payment_status' => 'verified']);
+    $this->actingAs(User::where('email', 'staff@demo.test')->first());
+
+    $html = Livewire::test(App\Livewire\Admin\BookingDetail::class, ['booking' => $b])->html();
+
+    expect($html)->toContain('คัดลอกข้อความ')
+        ->and($html)->toContain("document.execCommand('copy')")
+        ->and($html)->toContain('data-copy-source');
+});
+
+it('ทุกปุ่มคัดลอกในแอปต้องผ่านคอมโพเนนต์ copy-box (ห้ามเรียก navigator.clipboard ตรงๆ ที่อื่น)', function () {
+    $offenders = collect(File::allFiles(resource_path('views')))
+        ->reject(fn ($f) => $f->getFilename() === 'copy-box.blade.php')
+        ->filter(fn ($f) => str_contains($f->getContents(), 'navigator.clipboard') || str_contains($f->getContents(), 'execCommand'))
+        ->map(fn ($f) => $f->getRelativePathname())->values()->all();
+
+    expect($offenders)->toBe([]);
+});
