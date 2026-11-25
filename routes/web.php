@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SlipController;
 use App\Livewire\Admin;
 use App\Livewire\BookingFlow;
+use App\Livewire\BookingLookup;
 use App\Livewire\BookingStatus;
 use App\Livewire\Home;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 // ---- ลูกค้า (ไม่ต้องสมัครสมาชิก) ----
 Route::get('/', Home::class)->name('home');
 Route::get('/book', BookingFlow::class)->name('book');
+Route::get('/booking-lookup', BookingLookup::class)->name('booking.lookup');
 Route::get('/booking/{token}', BookingStatus::class)->name('booking.show')->where('token', '[A-Za-z0-9]{48}');
 Route::get('/booking/{token}/slip', [SlipController::class, 'forCustomer'])->name('booking.slip')->where('token', '[A-Za-z0-9]{48}');
 

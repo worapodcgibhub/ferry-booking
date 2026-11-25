@@ -19,6 +19,7 @@
                 <a href="{{ route('home') }}" class="border-b-2 border-pink pb-1 text-pink">หน้าแรก</a>
                 <a href="{{ route('home') }}#schedule" class="hover:text-pink">ตารางเรือ</a>
                 <a href="{{ route('home') }}#ports" class="hover:text-pink">ข้อมูลท่าเรือ</a>
+                <a href="{{ route('booking.lookup') }}" class="hover:text-pink">ตรวจสอบการจอง / แจ้งโอนเงิน</a>
                 <a href="{{ route('home') }}#help" class="hover:text-pink">ช่วยเหลือ</a>
             </nav>
             <button class="md:hidden" @click="open = !open" aria-label="เมนู">
@@ -29,6 +30,7 @@
             <a href="{{ route('home') }}">หน้าแรก</a>
             <a href="{{ route('home') }}#schedule">ตารางเรือ</a>
             <a href="{{ route('home') }}#ports">ข้อมูลท่าเรือ</a>
+            <a href="{{ route('booking.lookup') }}">ตรวจสอบการจอง / แจ้งโอนเงิน</a>
             <a href="{{ route('home') }}#help">ช่วยเหลือ</a>
         </nav>
     </header>
@@ -37,7 +39,8 @@
 
     <footer id="help" class="mt-12 border-t border-slate-200 bg-white">
         <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-slate-600 md:flex-row md:justify-between">
-            <p>ช่วยเหลือ: ลูกค้าโอนเงินเอง → แจ้งโอนพร้อมแนบสลิป → ทีมงานตรวจยอด → ยืนยันและส่งเลขจองทางอีเมล</p>
+            <p>ช่วยเหลือ: จองแล้วโอนเงินเอง → แจ้งโอนพร้อมแนบสลิปภายในเวลาที่กำหนด → ทีมงานตรวจยอด → ยืนยันทางอีเมล
+                · โอนทีหลังหรือปิดหน้าไปแล้ว <a class="font-bold text-pink underline" href="{{ route('booking.lookup') }}">ตรวจสอบการจอง / แจ้งโอนเงิน</a> ด้วยเลขอ้างอิงและเบอร์โทรหรืออีเมลที่ใช้จอง</p>
             <p>ระบบทดสอบในเครื่อง · ข้อมูลทั้งหมดเป็นข้อมูลสมมติ · <a class="underline" href="{{ route('login') }}">เจ้าหน้าที่</a></p>
         </div>
         <x-cover-credits />
